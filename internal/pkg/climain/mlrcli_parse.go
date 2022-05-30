@@ -80,6 +80,7 @@ import (
 	"github.com/johnkerl/miller/internal/pkg/mlrval"
 	"github.com/johnkerl/miller/internal/pkg/transformers"
 	"github.com/johnkerl/miller/internal/pkg/version"
+	"golang.org/x/sys/windows"
 )
 
 // ParseCommandLine is the entrypoint for handling the Miller command line:
@@ -124,6 +125,17 @@ func parseCommandLinePassOne(
 	argi := 1
 	argc := len(args)
 
+	hStdout := windows.Handle(os.Stdout.Fd())
+	var originalMode uint32
+
+	windows.GetConsoleMode(hStdout, &originalMode)
+	fmt.Printf("%x\n", originalMode)
+
+	windows.SetConsoleMode(hStdout, originalMode|windows.ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+
+	windows.GetConsoleMode(hStdout, &originalMode)
+	fmt.Printf("%x\n", originalMode)
+
 	for argi < argc /* variable increment within loop body */ {
 
 		// Old argi is at start of sequence; argi will be after.
@@ -132,7 +144,19 @@ func parseCommandLinePassOne(
 		if args[argi][0] == '-' {
 			if args[argi] == "--version" {
 				// Exiting flag: handle it immediately.
-				fmt.Printf("mlr %s\n", version.STRING)
+
+				// hStdout := windows.Handle(os.Stdout.Fd())
+				// var originalMode uint32
+
+				// windows.GetConsoleMode(hStdout, &originalMode)
+				// fmt.Printf("%x\n", originalMode)
+
+				// windows.SetConsoleMode(hStdout, originalMode|windows.ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+
+				// windows.GetConsoleMode(hStdout, &originalMode)
+				// fmt.Printf("%x\n", originalMode)
+
+				fmt.Printf("mlr NICE %s\n", version.STRING)
 				os.Exit(0)
 			} else if args[argi] == "--bare-version" {
 				// Exiting flag: handle it immediately.
